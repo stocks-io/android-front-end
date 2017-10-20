@@ -2,8 +2,16 @@ package com.stocks.stocks_io.Activities;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -15,6 +23,10 @@ import com.stocks.stocks_io.POJO.FullUserInfo;
 import com.stocks.stocks_io.POJO.LoginResponse;
 import com.stocks.stocks_io.R;
 
+import org.w3c.dom.Text;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,13 +37,70 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
     private Gson gson;
 
+    @BindView(R.id.auth_title_view)
+    public TextView authView;
+
+    @BindView(R.id.email_input)
+    public TextInputEditText emailInput;
+
+    @BindView(R.id.password_input)
+    public TextInputEditText passwordInput;
+
+    @BindView(R.id.continue_button)
+    public FloatingActionButton continueButton;
+
+    @BindView(R.id.auth_switch)
+    public Switch authSwitch;
+
+    @BindView(R.id.switch_text)
+    public TextView switchText;
+
+    @BindView(R.id.username_input)
+    public TextInputEditText usernameInput;
+
+    @BindView(R.id.first_name_input)
+    public TextInputEditText firstNameInput;
+
+    @BindView(R.id.last_name_input)
+    public TextInputEditText lastnameInput;
+
+    @BindView(R.id.register_details)
+    public LinearLayout registerDetails;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        gson = new GsonBuilder().create();
-        loginUser();
+        ButterKnife.bind(this);
+
+        authSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (!isChecked) {
+                registerDetails.setVisibility(View.GONE);
+                authView.setText(getString(R.string.login));
+                switchText.setText(getString(R.string.register));
+            } else {
+                registerDetails.setVisibility(View.VISIBLE);
+                authView.setText(getString(R.string.register));
+                switchText.setText(getString(R.string.login));
+            }
+        });
+
+        continueButton.setOnClickListener(v -> {
+            String username, password;
+            username = emailInput.getText().toString();
+            password = passwordInput.getText().toString();
+            
+            if (username.equals("")) {
+                Toast.makeText(this, "Please include a username", Toast.LENGTH_LONG).show();
+                return;
+            }
+            if (password.equals("")) {
+                Toast.makeText(this, "Please include a password", Toast.LENGTH_LONG).show();
+                return;
+            }
+            loginUser(username, password);
+        });
     }
 
     public void registerUser() {
@@ -68,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void loginUser() {
+    public void loginUser(String username, String password) {
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(Endpoints.BASEURL)
             .addConverterFactory(GsonConverterFactory.create(gson))
@@ -76,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
         UsersModel model = retrofit.create(UsersModel.class);
 
-        BaseUserInfo bubu = new BaseUserInfo("dgdg", "1234");
+        BaseUserInfo bubu = new BaseUserInfo(username, password);
         Call<LoginResponse> loginUser = model.loginUser(bubu);
         loginUser.enqueue(new Callback<LoginResponse>() {
             @Override
