@@ -13,13 +13,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.squareup.moshi.Moshi;
 import com.stocks.stocks_io.Data.Endpoints;
 import com.stocks.stocks_io.Model.UsersModel;
 import com.stocks.stocks_io.POJO.BaseMessage;
-import com.stocks.stocks_io.POJO.BaseUserInfo;
-import com.stocks.stocks_io.POJO.FullUserInfo;
 import com.stocks.stocks_io.POJO.LoginResponse;
 import com.stocks.stocks_io.R;
 
@@ -31,11 +28,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
-    private Gson gson;
+    private Moshi moshi;
 
     @BindView(R.id.auth_title_view)
     public TextView authView;
@@ -106,12 +103,11 @@ public class MainActivity extends AppCompatActivity {
     public void registerUser() {
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(Endpoints.BASEURL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addConverterFactory(MoshiConverterFactory.create())
             .build();
 
         UsersModel model = retrofit.create(UsersModel.class);
-        FullUserInfo fu = new FullUserInfo("dgdg", "1234", "darrien", "glasser", "pizza@outlook.com");
-        Call<BaseMessage> registerUser = model.registerUser(fu);
+        Call<BaseMessage> registerUser = model.registerUser("pizza dog", "1234", "darrien", "glasser", "pizza@outlook.com");
         registerUser.enqueue(new Callback<BaseMessage>() {
             @Override
             public void onResponse(@NonNull Call<BaseMessage> call, @NonNull Response<BaseMessage> response) {
@@ -123,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception e) {
 
                     }
-                    Log.wtf(TAG, "Response code: " + errorBody);
+                    Log.wtf(TAG, "Response error body: " + errorBody);
                     return;
                 }
 
@@ -140,13 +136,12 @@ public class MainActivity extends AppCompatActivity {
     public void loginUser(String username, String password) {
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(Endpoints.BASEURL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build();
 
         UsersModel model = retrofit.create(UsersModel.class);
 
-        BaseUserInfo bubu = new BaseUserInfo(username, password);
-        Call<LoginResponse> loginUser = model.loginUser(bubu);
+        Call<LoginResponse> loginUser = model.loginUser(username, password);
         loginUser.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
@@ -162,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                Log.wtf(TAG, "Response body: " + response.body().getToken());
-                Log.wtf(TAG, "Response body: " + response.body().getUserId());
+                Log.wtf(TAG, "Response token: " + response.body().getToken());
+                Log.wtf(TAG, "Response id: " + response.body().getUserId());
             }
 
             @Override
