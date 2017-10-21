@@ -7,7 +7,6 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -19,8 +18,6 @@ import com.stocks.stocks_io.Model.UsersModel;
 import com.stocks.stocks_io.POJO.BaseMessage;
 import com.stocks.stocks_io.POJO.LoginResponse;
 import com.stocks.stocks_io.R;
-
-import org.w3c.dom.Text;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -70,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
+        switchText.setOnClickListener(v -> authSwitch.setChecked(!authSwitch.isChecked()));
 
         authSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (!isChecked) {
