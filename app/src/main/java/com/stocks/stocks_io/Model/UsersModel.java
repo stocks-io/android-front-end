@@ -12,14 +12,13 @@ public interface UsersModel {
 
     @POST("users/register")
     @FormUrlEncoded
-    Call<BaseMessage> registerUser(@Field("username") String username,
-                                   @Field("password") String password,
-                                   @Field("firstName") String firstName,
+    Call<BaseMessage> registerUser(@Field("firstName") String firstName,
                                    @Field("lastName") String lastName,
-                                   @Field("email") String email);
+                                   @Field("email") String email,
+                                   @Field("password") String password);
 
     @POST("users/login")
     @FormUrlEncoded
-    Call<LoginResponse> loginUser(@Field("username") String username,
+    Call<LoginResponse> loginUser(@Field("email") String email,
                                   @Field("password") String password);
 }

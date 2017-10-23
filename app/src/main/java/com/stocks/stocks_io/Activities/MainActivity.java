@@ -49,9 +49,6 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.switch_text)
     public TextView switchText;
 
-    @BindView(R.id.username_input)
-    public TextInputEditText usernameInput;
-
     @BindView(R.id.first_name_input)
     public TextInputEditText firstNameInput;
 
@@ -83,19 +80,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         continueButton.setOnClickListener(v -> {
-            String username, password;
-            username = emailInput.getText().toString();
+            String email, password;
+            email = emailInput.getText().toString();
             password = passwordInput.getText().toString();
             
-            if (username.equals("")) {
-                Toast.makeText(this, "Please include a username", Toast.LENGTH_LONG).show();
+            if (email.equals("")) {
+                Toast.makeText(this, "Please include an email", Toast.LENGTH_LONG).show();
                 return;
             }
             if (password.equals("")) {
                 Toast.makeText(this, "Please include a password", Toast.LENGTH_LONG).show();
                 return;
             }
-            loginUser(username, password);
+            loginUser(email, password);
         });
     }
 
@@ -106,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             .build();
 
         UsersModel model = retrofit.create(UsersModel.class);
-        Call<BaseMessage> registerUser = model.registerUser("pizza dog", "1234", "darrien", "glasser", "pizza@outlook.com");
+        Call<BaseMessage> registerUser = model.registerUser("Dave", "Machado", "d@glasser.com", "pizzaDog");
         registerUser.enqueue(new Callback<BaseMessage>() {
             @Override
             public void onResponse(@NonNull Call<BaseMessage> call, @NonNull Response<BaseMessage> response) {
@@ -132,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void loginUser(String username, String password) {
+    public void loginUser(String email, String password) {
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(Endpoints.BASEURL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -140,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
         UsersModel model = retrofit.create(UsersModel.class);
 
-        Call<LoginResponse> loginUser = model.loginUser(username, password);
+        Call<LoginResponse> loginUser = model.loginUser(email, password);
         loginUser.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
