@@ -3,6 +3,6 @@
     <string name="login">Login</string>
     <string name="register">Register</string>
     <string name="filler">Filler</string>
-    <string name="user_logged_in">Anything</string>
-    <string name="user_email">Anything</string>
+    <string name="user_logged_in">user_logged_in</string>
+    <string name="user_email">user_email</string>
 </resources>

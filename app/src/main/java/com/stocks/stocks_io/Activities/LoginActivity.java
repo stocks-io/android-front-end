@@ -32,7 +32,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
     private String TAG = LoginActivity.class.getSimpleName();
-    private Moshi moshi;
 
     private static final boolean DEBUG = true;
 
@@ -75,8 +74,11 @@ public class LoginActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(getString(R.string.filler), MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
-        if (sharedPreferences.getBoolean(getString(R.string.user_logged_in), false) || DEBUG) {
-            startActivity(new Intent(this, StocksActivity.class));
+        if (sharedPreferences.getBoolean(getString(R.string.user_logged_in), false)) {
+            Intent intent = new Intent(this, StocksActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
         }
 
         switchText.setOnClickListener(v -> authSwitch.setChecked(!authSwitch.isChecked()));
@@ -163,7 +165,7 @@ public class LoginActivity extends AppCompatActivity {
     public void loginUser(String email, String password) {
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(Endpoints.BASEURL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .addConverterFactory(MoshiConverterFactory.create())
             .build();
 
         UsersModel model = retrofit.create(UsersModel.class);
@@ -189,7 +191,10 @@ public class LoginActivity extends AppCompatActivity {
 
                 editor.putBoolean(getString(R.string.user_logged_in), true).apply();
                 editor.putString(getString(R.string.user_email), email).apply();
-                startActivity(new Intent(LoginActivity.this, StocksActivity.class));
+                Intent intent = new Intent(LoginActivity.this, StocksActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
             }
 
             @Override

@@ -94,8 +94,7 @@
                     android:drawablePadding="16dp"
                     android:drawableStart="@drawable/ic_face"
                     android:gravity="center_vertical"
-                    android:hint="First Name"
-                    android:inputType="textPassword" />
+                    android:hint="First Name" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -110,8 +109,7 @@
                     android:drawablePadding="16dp"
                     android:drawableStart="@drawable/ic_pencil"
                     android:gravity="center_vertical"
-                    android:hint="Last Name"
-                    android:inputType="textPassword" />
+                    android:hint="Last Name" />
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
