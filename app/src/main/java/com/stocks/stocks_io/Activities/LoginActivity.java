@@ -1,6 +1,9 @@
 package com.stocks.stocks_io.Activities;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
@@ -27,9 +30,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
-    private String TAG = MainActivity.class.getSimpleName();
+public class LoginActivity extends AppCompatActivity {
+    private String TAG = LoginActivity.class.getSimpleName();
     private Moshi moshi;
+
+    private static final boolean DEBUG = true;
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @BindView(R.id.auth_title_view)
     public TextView authView;
@@ -53,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     public TextInputEditText firstNameInput;
 
     @BindView(R.id.last_name_input)
-    public TextInputEditText lastnameInput;
+    public TextInputEditText lastNameInput;
 
     @BindView(R.id.register_details)
     public LinearLayout registerDetails;
@@ -64,6 +72,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+        sharedPreferences = getSharedPreferences(getString(R.string.filler), MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        if (sharedPreferences.getBoolean(getString(R.string.user_logged_in), false) || DEBUG) {
+            startActivity(new Intent(this, StocksActivity.class));
+        }
 
         switchText.setOnClickListener(v -> authSwitch.setChecked(!authSwitch.isChecked()));
 
@@ -92,18 +106,35 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please include a password", Toast.LENGTH_LONG).show();
                 return;
             }
-            loginUser(email, password);
+
+            if (!authSwitch.isChecked()) {
+                loginUser(email, password);
+            } else {
+                String firstName, lastName;
+                firstName = firstNameInput.getText().toString();
+                lastName = lastNameInput.getText().toString();
+
+                if (firstName.equals("")) {
+                    Toast.makeText(this, "Please include a first name", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (lastName.equals("")) {
+                    Toast.makeText(this, "Please include a last name", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                registerUser(firstName, lastName, email, password);
+            }
         });
     }
 
-    public void registerUser() {
+    public void registerUser(String firstName, String lastName, String email, String password) {
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(Endpoints.BASEURL)
             .addConverterFactory(MoshiConverterFactory.create())
             .build();
 
         UsersModel model = retrofit.create(UsersModel.class);
-        Call<BaseMessage> registerUser = model.registerUser("Dave", "Machado", "d@glasser.com", "pizzaDog");
+        Call<BaseMessage> registerUser = model.registerUser(firstName, lastName, email, password);
         registerUser.enqueue(new Callback<BaseMessage>() {
             @Override
             public void onResponse(@NonNull Call<BaseMessage> call, @NonNull Response<BaseMessage> response) {
@@ -118,8 +149,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.wtf(TAG, "Response error body: " + errorBody);
                     return;
                 }
-
                 Log.wtf(TAG, "Response body: " + response.body().getMessage());
+                loginUser(email, password);
             }
 
             @Override
@@ -155,6 +186,10 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.wtf(TAG, "Response token: " + response.body().getToken());
                 Log.wtf(TAG, "Response id: " + response.body().getUserId());
+
+                editor.putBoolean(getString(R.string.user_logged_in), true).apply();
+                editor.putString(getString(R.string.user_email), email).apply();
+                startActivity(new Intent(LoginActivity.this, StocksActivity.class));
             }
 
             @Override
