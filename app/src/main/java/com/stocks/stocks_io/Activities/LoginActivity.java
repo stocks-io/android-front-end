@@ -3,7 +3,6 @@ package com.stocks.stocks_io.Activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
@@ -15,7 +14,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.moshi.Moshi;
 import com.stocks.stocks_io.Data.Endpoints;
 import com.stocks.stocks_io.Model.UsersModel;
 import com.stocks.stocks_io.POJO.BaseMessage;
@@ -71,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
-        sharedPreferences = getSharedPreferences(getString(R.string.filler), MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
         if (sharedPreferences.getBoolean(getString(R.string.user_logged_in), false)) {
@@ -131,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void registerUser(String firstName, String lastName, String email, String password) {
         Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(Endpoints.BASEURL)
+            .baseUrl(Endpoints.DEVBASEURL)
             .addConverterFactory(MoshiConverterFactory.create())
             .build();
 
@@ -164,7 +162,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void loginUser(String email, String password) {
         Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(Endpoints.BASEURL)
+            .baseUrl(Endpoints.DEVBASEURL)
             .addConverterFactory(MoshiConverterFactory.create())
             .build();
 
@@ -191,6 +189,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 editor.putBoolean(getString(R.string.user_logged_in), true).apply();
                 editor.putString(getString(R.string.user_email), email).apply();
+                editor.putString(getString(R.string.token), response.body().getToken()).apply();
                 Intent intent = new Intent(LoginActivity.this, StocksActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);

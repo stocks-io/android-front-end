@@ -1,9 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:gravity="center"
     tools:context="com.stocks.stocks_io.Activities.StocksActivity">
+
+    <Button android:id="@+id/data_button"
+        android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+    android:text="Get me some data fam"/>
+
+    <Button android:id="@+id/logout_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="log me out fam"/>
+
+    <Button android:id="@+id/buy_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="buy me some tsla fam"/>
+
+    <Button android:id="@+id/sell_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="sell me some tsla fam"/>
 
 </LinearLayout>
