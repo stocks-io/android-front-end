@@ -54,7 +54,7 @@ class StocksActivity : AppCompatActivity() {
                                     "Cash remaining: ${response.body()?.remainingCash}",
                             LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(applicationContext, "KEEP YO TSLA FAM ${response.body()?.message}", LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, "KEEP YO TSLA FAM ${response.message()}", LENGTH_LONG).show()
                 }
             }
 
@@ -83,7 +83,7 @@ class StocksActivity : AppCompatActivity() {
                                     "Cash remaining: ${response.body()?.remainingCash}",
                             LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(applicationContext, "No TSLA for u fam ${response.body()?.message}", LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, "No TSLA for u fam ${response.message()}", LENGTH_LONG).show()
                 }
 
             }
@@ -109,7 +109,7 @@ class StocksActivity : AppCompatActivity() {
             override fun onResponse(call: Call<BaseMessage>, response: Response<BaseMessage>) {
                 if (response.isSuccessful) {
                     Toast.makeText(applicationContext, "We logged out fam", LENGTH_LONG).show()
-                    preferences.edit().putString(getString(R.string.token), null).apply()
+                    preferences.edit().clear().apply()
                 } else {
                     Toast.makeText(applicationContext, "Failed to log out... Maybe we were never logged in in the first place???", LENGTH_LONG).show()
                 }
