@@ -7,6 +7,13 @@
               android:gravity="center"
     tools:context="com.stocks.stocks_io.Activities.StocksActivity">
 
+    <com.jjoe64.graphview.GraphView
+        android:layout_width="match_parent"
+        android:layout_height="200dip"
+        android:layout_margin="16dp"
+        android:padding="16dp"
+        android:id="@+id/graph" />
+
     <Button android:id="@+id/data_button"
         android:layout_width="wrap_content"
             android:layout_height="wrap_content"

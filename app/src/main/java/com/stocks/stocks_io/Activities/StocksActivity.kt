@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
+import com.jjoe64.graphview.series.DataPoint
+import com.jjoe64.graphview.series.LineGraphSeries
 import com.stocks.stocks_io.Data.Endpoints
 import com.stocks.stocks_io.Data.Endpoints.DEVBASEURL
 import com.stocks.stocks_io.Model.PortfolioModel
@@ -34,6 +36,17 @@ class StocksActivity : AppCompatActivity() {
         logout_button.setOnClickListener { logout() }
         buy_button.setOnClickListener { buyStocks("TSLA", 5) }
         sell_button.setOnClickListener { sellStocks("TSLA", 5) }
+
+        val series = LineGraphSeries<DataPoint>(arrayOf(
+                DataPoint(0.0, 15.0),
+                DataPoint(1.0, 4.0),
+                DataPoint(3.1, 2.0),
+                DataPoint(6.0, 10.0)
+        ))
+
+        graph.title = "pizza dog"
+
+        graph.addSeries(series)
     }
 
     private fun sellStocks(symbol: String, units: Int) {
