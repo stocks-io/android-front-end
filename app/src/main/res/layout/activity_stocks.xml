@@ -1,37 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:gravity="center"
-    tools:context="com.stocks.stocks_io.Activities.StocksActivity">
+    android:layout_height="wrap_content">
 
-    <com.jjoe64.graphview.GraphView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dip"
-        android:layout_margin="16dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
         android:padding="16dp"
-        android:id="@+id/graph" />
+        tools:context="com.stocks.stocks_io.Activities.StocksActivity">
 
-    <Button android:id="@+id/data_button"
-        android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-    android:text="Get me some data fam"/>
+        <com.jjoe64.graphview.GraphView
+            android:id="@+id/graph"
+            android:layout_width="match_parent"
+            android:layout_height="200dip"
+            android:layout_margin="16dp"
+            android:padding="16dp"/>
 
-    <Button android:id="@+id/logout_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="log me out fam"/>
+        <android.support.v7.widget.CardView android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="horizontal">
 
-    <Button android:id="@+id/buy_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="buy me some tsla fam"/>
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
 
-    <Button android:id="@+id/sell_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="sell me some tsla fam"/>
+                <TextView style="@style/mini_text"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:textStyle="normal"
+                          android:layout_weight="1"
+                          android:text="SYMB"/>
+                <TextView style="@style/mini_text"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="1"
+                          android:textStyle="normal"
+                          android:text="UNITS"/>
+                <TextView style="@style/mini_text"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:textStyle="normal"
+                          android:layout_weight="1"
+                          android:text="PRICE"/>
 
-</LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.RecyclerView android:id="@+id/options"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
+</ScrollView>

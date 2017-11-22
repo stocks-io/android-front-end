@@ -6,4 +6,6 @@
     <string name="user_logged_in">user_logged_in</string>
     <string name="user_email">user_email</string>
     <string name="token">token</string>
+
+    <string name="price">$%1$s</string>
 </resources>

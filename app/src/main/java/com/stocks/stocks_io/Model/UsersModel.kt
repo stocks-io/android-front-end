@@ -3,7 +3,6 @@ package com.stocks.stocks_io.Model
 import com.stocks.stocks_io.POJO.BaseMessage
 import com.stocks.stocks_io.POJO.HistoryMessage
 import com.stocks.stocks_io.POJO.LoginResponse
-
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

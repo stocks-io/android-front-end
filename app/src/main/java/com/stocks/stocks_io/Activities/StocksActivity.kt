@@ -2,51 +2,112 @@ package com.stocks.stocks_io.Activities
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import com.stocks.stocks_io.Data.Endpoints
 import com.stocks.stocks_io.Data.Endpoints.DEVBASEURL
+import com.stocks.stocks_io.Data.Endpoints.STOCKS_BASE_URL
 import com.stocks.stocks_io.Model.PortfolioModel
+import com.stocks.stocks_io.Model.StockPriceOptions
 import com.stocks.stocks_io.Model.UsersModel
+import com.stocks.stocks_io.OptionsAdapter
 import com.stocks.stocks_io.POJO.BaseMessage
+import com.stocks.stocks_io.POJO.ExtendedOptions
 import com.stocks.stocks_io.POJO.HistoryMessage
 import com.stocks.stocks_io.POJO.OrderRequest
 import com.stocks.stocks_io.R
 import com.stocks.stocks_io.Utils.getUserToken
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_stocks.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.*
 
 class StocksActivity : AppCompatActivity() {
 
     val TAG = "StocksActivity"
+    val MOCK_TOKEN = "E48D1744-6042-4F8B-BC67-3E62B1AC77ED"
+    var num = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stocks)
 
-        data_button.setOnClickListener { getUserHistory("1234567890") }
-        logout_button.setOnClickListener { logout() }
-        buy_button.setOnClickListener { buyStocks("TSLA", 5) }
-        sell_button.setOnClickListener { sellStocks("TSLA", 5) }
+        getUserHistory("1234567890")
+        getStockWatch()
+    }
 
-        val series = LineGraphSeries<DataPoint>(arrayOf(
-                DataPoint(0.0, 15.0),
-                DataPoint(1.0, 4.0),
-                DataPoint(3.1, 2.0),
-                DataPoint(6.0, 10.0)
-        ))
+    private fun reactiveGetStockWatch() {
+        val usersAsync = Retrofit.Builder()
+                .baseUrl(DEVBASEURL)
+                .addConverterFactory(MoshiConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
 
-        graph.title = "pizza dog"
+        val stocksAsync = Retrofit.Builder()
+                .baseUrl(STOCKS_BASE_URL)
+                .addConverterFactory(MoshiConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
 
-        graph.addSeries(series)
+        val orders = usersAsync.create(PortfolioModel::class.java)
+
+        val stocks = stocksAsync.create(StockPriceOptions::class.java)
+
+        val stocksResponse = orders.getUserStocksReactive(MOCK_TOKEN)
+        stocksResponse.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+
+
+        orders.getUserStocks(MOCK_TOKEN).execute().body()?.let {
+
+            val extendedOptions = it.map { ExtendedOptions(it.Symbol, it.Units, stocks.getStockPrice(it.Symbol).execute().body()?.latestPrice ?: -1.0) }
+            Handler(Looper.getMainLooper()).post({
+                options.layoutManager = LinearLayoutManager(applicationContext)
+                options.adapter = OptionsAdapter(extendedOptions)
+            })
+        }
+    }
+
+    private fun getStockWatch() {
+        Thread {
+            val usersAsync = Retrofit.Builder()
+                    .baseUrl(DEVBASEURL)
+                    .addConverterFactory(MoshiConverterFactory.create())
+                    .build()
+
+            val stocksAsync = Retrofit.Builder()
+                    .baseUrl(STOCKS_BASE_URL)
+                    .addConverterFactory(MoshiConverterFactory.create())
+                    .build()
+
+            val orders = usersAsync.create(PortfolioModel::class.java)
+
+            val stocks = stocksAsync.create(StockPriceOptions::class.java)
+
+
+            orders.getUserStocks(MOCK_TOKEN).execute().body()?.let {
+
+                val extendedOptions = it.map { ExtendedOptions(it.Symbol, it.Units, stocks.getStockPrice(it.Symbol).execute().body()?.latestPrice ?: -1.0) }
+                Handler(Looper.getMainLooper()).post({
+                    options.layoutManager = LinearLayoutManager(applicationContext)
+                    options.adapter = OptionsAdapter(extendedOptions)
+                })
+            }
+        }.start()
     }
 
     private fun sellStocks(symbol: String, units: Int) {
@@ -142,16 +203,24 @@ class StocksActivity : AppCompatActivity() {
                 .build()
 
         val usersModel = retrofit.create(UsersModel::class.java)
-        usersModel.getUserHistory(token).enqueue(object : Callback<List<HistoryMessage>> {
+
+        // TODO: Remove when done using mock
+//        usersModel.getUserHistory(token).enqueue(object : Callback<List<HistoryMessage>> {
+        usersModel.getUserHistory(MOCK_TOKEN).enqueue(object : Callback<List<HistoryMessage>> {
             override fun onFailure(call: Call<List<HistoryMessage>>, t: Throwable) {
                 Log.wtf(TAG, "This is why I cry myself to sleep every night")
             }
 
             override fun onResponse(call: Call<List<HistoryMessage>>, response: Response<List<HistoryMessage>>) {
                 if (response.isSuccessful) {
-                    for (historyMessage in response.body().orEmpty()) {
-                        Log.wtf(TAG, "Date: ${historyMessage.Date} Value: ${historyMessage.Value}")
-                    }
+
+                    val historyMessages = response.body() ?: listOf()
+                    val sortedHistoryMessages = historyMessages.sortedWith(compareBy({ it.Date.toLong() }))
+                    val series = LineGraphSeries<DataPoint>(historyToDataPoint(sortedHistoryMessages).toTypedArray())
+
+                    graph.title = "User Stock History"
+
+                    graph.addSeries(series)
                 } else {
                     Log.wtf(TAG, response.message().toString())
                 }
@@ -159,4 +228,17 @@ class StocksActivity : AppCompatActivity() {
         })
 
     }
+
+    // TODO: REPLACE SECOND PARAMETER WITH `DataPoint(msToDate(it.Date)`
+    private fun historyToDataPoint(messages: List<HistoryMessage>): List<DataPoint> {
+        val list = mutableListOf<DataPoint>()
+        messages.forEach {
+            list.add(DataPoint(num, it.Value))
+            num += 10
+        }
+        return list
+    }
+
+    private fun msToDate(ms: String): Date = Date(ms.toLong())
 }
+
