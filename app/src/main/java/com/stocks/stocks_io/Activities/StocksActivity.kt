@@ -9,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import com.stocks.stocks_io.Data.Endpoints
@@ -25,8 +24,6 @@ import com.stocks.stocks_io.POJO.HistoryMessage
 import com.stocks.stocks_io.POJO.OrderRequest
 import com.stocks.stocks_io.R
 import com.stocks.stocks_io.Utils.getUserToken
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_stocks.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -47,39 +44,6 @@ class StocksActivity : AppCompatActivity() {
 
         getUserHistory("1234567890")
         getStockWatch()
-    }
-
-    private fun reactiveGetStockWatch() {
-        val usersAsync = Retrofit.Builder()
-                .baseUrl(DEVBASEURL)
-                .addConverterFactory(MoshiConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
-
-        val stocksAsync = Retrofit.Builder()
-                .baseUrl(STOCKS_BASE_URL)
-                .addConverterFactory(MoshiConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
-
-        val orders = usersAsync.create(PortfolioModel::class.java)
-
-        val stocks = stocksAsync.create(StockPriceOptions::class.java)
-
-        val stocksResponse = orders.getUserStocksReactive(MOCK_TOKEN)
-        stocksResponse.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
-
-
-        orders.getUserStocks(MOCK_TOKEN).execute().body()?.let {
-
-            val extendedOptions = it.map { ExtendedOptions(it.Symbol, it.Units, stocks.getStockPrice(it.Symbol).execute().body()?.latestPrice ?: -1.0) }
-            Handler(Looper.getMainLooper()).post({
-                options.layoutManager = LinearLayoutManager(applicationContext)
-                options.adapter = OptionsAdapter(extendedOptions)
-            })
-        }
     }
 
     private fun getStockWatch() {
