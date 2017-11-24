@@ -8,4 +8,11 @@
     <string name="token">token</string>
 
     <string name="price">$%1$s</string>
+
+    <string name="buy_shares">Buy Shares</string>
+    <string name="sell_shares">Sell Shares</string>
+
+    <string name="how_many">How Many?</string>
+    <string name="number">Number</string>
+    <string name="go">GO</string>
 </resources>

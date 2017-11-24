@@ -23,6 +23,7 @@ import com.stocks.stocks_io.POJO.ExtendedOptions
 import com.stocks.stocks_io.POJO.HistoryMessage
 import com.stocks.stocks_io.POJO.OrderRequest
 import com.stocks.stocks_io.R
+import com.stocks.stocks_io.StockClickListener
 import com.stocks.stocks_io.Utils.getUserToken
 import kotlinx.android.synthetic.main.activity_stocks.*
 import retrofit2.Call
@@ -68,7 +69,16 @@ class StocksActivity : AppCompatActivity() {
                 val extendedOptions = it.map { ExtendedOptions(it.Symbol, it.Units, stocks.getStockPrice(it.Symbol).execute().body()?.latestPrice ?: -1.0) }
                 Handler(Looper.getMainLooper()).post({
                     options.layoutManager = LinearLayoutManager(applicationContext)
-                    options.adapter = OptionsAdapter(extendedOptions)
+                    val optionsAdapter = OptionsAdapter(extendedOptions)
+                    optionsAdapter.stockClickLister = object: StockClickListener {
+                        override fun onStockClicked(option: ExtendedOptions) {
+                            val stockFragment = PopupBuySellFragment()
+                            stockFragment.options = option
+                            stockFragment.show(fragmentManager, "PIZZA DOG")
+                        }
+                    }
+
+                    options.adapter = optionsAdapter
                 })
             }
         }.start()
