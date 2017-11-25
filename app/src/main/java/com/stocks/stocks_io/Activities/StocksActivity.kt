@@ -43,7 +43,9 @@ class StocksActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stocks)
 
+        Log.w("s", "i am a failure")
         getUserHistory("1234567890")
+        Log.w("s", "failed to get prices")
         getStockWatch()
     }
 
@@ -63,21 +65,24 @@ class StocksActivity : AppCompatActivity() {
 
             val stocks = stocksAsync.create(StockPriceOptions::class.java)
 
-
             orders.getUserStocks(MOCK_TOKEN).execute().body()?.let {
 
                 val extendedOptions = it.map { ExtendedOptions(it.Symbol, it.Units, stocks.getStockPrice(it.Symbol).execute().body()?.latestPrice ?: -1.0) }
+                Log.w("s", "got prices")
                 Handler(Looper.getMainLooper()).post({
+                    Toast.makeText(application, "kill me now", Toast.LENGTH_LONG).show()
                     options.layoutManager = LinearLayoutManager(applicationContext)
                     val optionsAdapter = OptionsAdapter(extendedOptions)
                     optionsAdapter.stockClickLister = object: StockClickListener {
                         override fun onStockClicked(option: ExtendedOptions) {
                             val stockFragment = PopupBuySellFragment()
                             stockFragment.options = option
+                            stockFragment.dismissListener = {
+                                getStockWatch()
+                            }
                             stockFragment.show(fragmentManager, "PIZZA DOG")
                         }
                     }
-
                     options.adapter = optionsAdapter
                 })
             }

@@ -1,7 +1,5 @@
 package com.stocks.stocks_io.POJO
 
-data class Buying(val Symbol: String, val Units: Int)
-
 data class Options(val Symbol: String, val Units: Int)
 
 data class StockPrice(val latestPrice: Double, val symbol: String)

@@ -2,11 +2,9 @@ package com.stocks.stocks_io.Model
 
 import com.stocks.stocks_io.POJO.Options
 import com.stocks.stocks_io.POJO.OrderRequest
-import okhttp3.ResponseBody
+import com.stocks.stocks_io.POJO.StockHistory
 import retrofit2.Call
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface PortfolioModel {
     @POST("/portfolio/buy")
@@ -26,7 +24,8 @@ interface PortfolioModel {
     @FormUrlEncoded
     fun getUserStocks(@Field("token") token: String): Call<List<Options>>
 
-    @POST("/portfolio/owned")
-    @FormUrlEncoded
-    fun getUserStocksDebug(@Field("token") token: String): Call<ResponseBody>
+    @GET("/portfolio/stockhistory/")
+    fun getStockHistory(@Query("token") token: String,
+                        @Query("symbol") symbol: String,
+                        @Query("timeframe") timeframe: String): Call<StockHistory>
 }

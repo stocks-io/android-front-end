@@ -2,57 +2,70 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="16dp"
-        tools:context="com.stocks.stocks_io.Activities.StocksActivity">
+    <android.support.design.widget.CoordinatorLayout android:layout_width="match_parent"
+                                                     android:layout_height="wrap_content">
 
-        <com.jjoe64.graphview.GraphView
-            android:id="@+id/graph"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="200dip"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            tools:context="com.stocks.stocks_io.Activities.StocksActivity">
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/graph"
+                android:layout_width="match_parent"
+                android:layout_height="200dip"
+                android:layout_margin="16dp"
+                android:padding="16dp"/>
+
+            <android.support.v7.widget.CardView android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:orientation="horizontal">
+
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:orientation="horizontal">
+
+                    <TextView style="@style/mini_text"
+                              android:layout_width="0dp"
+                              android:layout_height="wrap_content"
+                              android:layout_weight="1"
+                              android:text="SYMB"
+                              android:textStyle="normal"/>
+                    <TextView style="@style/mini_text"
+                              android:layout_width="0dp"
+                              android:layout_height="wrap_content"
+                              android:layout_weight="1"
+                              android:text="UNITS"
+                              android:textStyle="normal"/>
+                    <TextView style="@style/mini_text"
+                              android:layout_width="0dp"
+                              android:layout_height="wrap_content"
+                              android:layout_weight="1"
+                              android:text="PRICE"
+                              android:textStyle="normal"/>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.RecyclerView android:id="@+id/options"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:padding="16dp"/>
+            android:src="@drawable/ic_buy_cart"
+            app:layout_anchorGravity="bottom|right|end" />
 
-        <android.support.v7.widget.CardView android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:orientation="horizontal">
-
-            <LinearLayout android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:orientation="horizontal">
-
-                <TextView style="@style/mini_text"
-                          android:layout_width="0dp"
-                          android:layout_height="wrap_content"
-                          android:textStyle="normal"
-                          android:layout_weight="1"
-                          android:text="SYMB"/>
-                <TextView style="@style/mini_text"
-                          android:layout_width="0dp"
-                          android:layout_height="wrap_content"
-                          android:layout_weight="1"
-                          android:textStyle="normal"
-                          android:text="UNITS"/>
-                <TextView style="@style/mini_text"
-                          android:layout_width="0dp"
-                          android:layout_height="wrap_content"
-                          android:textStyle="normal"
-                          android:layout_weight="1"
-                          android:text="PRICE"/>
-
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-        <android.support.v7.widget.RecyclerView android:id="@+id/options"
-                                                android:layout_width="match_parent"
-                                                android:layout_height="wrap_content"/>
-    </LinearLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
 
 </ScrollView>

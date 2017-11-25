@@ -20,18 +20,20 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="150dp"/>
 
-        <RadioGroup android:layout_width="match_parent"
-                    android:id="@+id/buy_sell_buttons"
+        <RadioGroup android:id="@+id/buy_sell_buttons"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:orientation="horizontal">
 
-            <RadioButton android:layout_width="0dp"
+            <RadioButton android:id="@+id/buy_radio"
+                         android:layout_width="0dp"
                          android:layout_height="wrap_content"
                          android:layout_weight="1"
                          android:text="@string/buy_shares"/>
 
-            <RadioButton android:layout_width="0dp"
+            <RadioButton android:id="@+id/sell_radio"
+                         android:layout_width="0dp"
                          android:layout_height="wrap_content"
                          android:layout_weight="1"
                          android:text="@string/sell_shares"/>
@@ -40,10 +42,10 @@
 
         <LinearLayout android:id="@+id/info_view"
                       android:layout_width="match_parent"
-                      android:visibility="gone"
                       android:layout_height="wrap_content"
                       android:gravity="center"
-                      android:orientation="vertical">
+                      android:orientation="vertical"
+                      android:visibility="gone">
 
             <TextView style="@style/mega_text"
                       android:layout_width="wrap_content"
@@ -58,12 +60,17 @@
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/input_view"
                     android:layout_width="match_parent"
-                    android:inputType="number"
                     android:layout_height="wrap_content"
-                    android:hint="@string/number"/>
+                    android:hint="@string/number"
+                    android:inputType="number"/>
 
             </android.support.design.widget.TextInputLayout>
 
+            <TextView android:id="@+id/calculator_view"
+                      style="@style/money_text"
+                      android:visibility="gone"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"/>
 
             <Button android:id="@+id/activate_button"
                     android:layout_width="wrap_content"
