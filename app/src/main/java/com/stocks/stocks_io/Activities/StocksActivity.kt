@@ -6,25 +6,26 @@ import android.os.Handler
 import android.os.Looper
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
+import com.stocks.stocks_io.Adapters.OptionsAdapter
+import com.stocks.stocks_io.Adapters.StockClickListener
 import com.stocks.stocks_io.Data.Endpoints
 import com.stocks.stocks_io.Data.Endpoints.DEVBASEURL
 import com.stocks.stocks_io.Data.Endpoints.STOCKS_BASE_URL
+import com.stocks.stocks_io.Fragments.PopupBuySellFragment
+import com.stocks.stocks_io.Fragments.PopupSearchFragment
 import com.stocks.stocks_io.Model.PortfolioModel
 import com.stocks.stocks_io.Model.StockPriceOptions
 import com.stocks.stocks_io.Model.UsersModel
-import com.stocks.stocks_io.OptionsAdapter
 import com.stocks.stocks_io.POJO.BaseMessage
 import com.stocks.stocks_io.POJO.ExtendedOptions
 import com.stocks.stocks_io.POJO.HistoryMessage
-import com.stocks.stocks_io.POJO.OrderRequest
 import com.stocks.stocks_io.R
-import com.stocks.stocks_io.StockClickListener
-import com.stocks.stocks_io.Utils.getUserToken
 import kotlinx.android.synthetic.main.activity_stocks.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -43,9 +44,12 @@ class StocksActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stocks)
 
-        Log.w("s", "i am a failure")
+        buy_fab?.setOnClickListener {
+            val searchFragment = PopupSearchFragment()
+            searchFragment.show(fragmentManager, "RETURN OF THE JEBI")
+        }
+
         getUserHistory("1234567890")
-        Log.w("s", "failed to get prices")
         getStockWatch()
     }
 
@@ -68,12 +72,10 @@ class StocksActivity : AppCompatActivity() {
             orders.getUserStocks(MOCK_TOKEN).execute().body()?.let {
 
                 val extendedOptions = it.map { ExtendedOptions(it.Symbol, it.Units, stocks.getStockPrice(it.Symbol).execute().body()?.latestPrice ?: -1.0) }
-                Log.w("s", "got prices")
                 Handler(Looper.getMainLooper()).post({
-                    Toast.makeText(application, "kill me now", Toast.LENGTH_LONG).show()
                     options.layoutManager = LinearLayoutManager(applicationContext)
                     val optionsAdapter = OptionsAdapter(extendedOptions)
-                    optionsAdapter.stockClickLister = object: StockClickListener {
+                    optionsAdapter.stockClickLister = object : StockClickListener {
                         override fun onStockClicked(option: ExtendedOptions) {
                             val stockFragment = PopupBuySellFragment()
                             stockFragment.options = option
@@ -83,69 +85,27 @@ class StocksActivity : AppCompatActivity() {
                             stockFragment.show(fragmentManager, "PIZZA DOG")
                         }
                     }
+                    options.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                        override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+                            if (dy > 0) {
+                                // Scroll Down
+                                if (buy_fab.isShown) {
+                                    buy_fab.hide()
+                                }
+                            } else if (dy < 0) {
+                                // Scroll Up
+                                if (!buy_fab.isShown) {
+                                    buy_fab.show()
+                                }
+                            }
+
+                        }
+                    })
                     options.adapter = optionsAdapter
                 })
             }
         }.start()
-    }
-
-    private fun sellStocks(symbol: String, units: Int) {
-        val token = getUserToken(applicationContext)
-        Log.wtf(TAG, token)
-
-        val retrofit = Retrofit.Builder()
-                .baseUrl(DEVBASEURL)
-                .addConverterFactory(MoshiConverterFactory.create())
-                .build()
-
-        val portfolioModel = retrofit.create(PortfolioModel::class.java)
-        portfolioModel.sellStocks(token, units, symbol).enqueue(object : Callback<OrderRequest> {
-            override fun onResponse(call: Call<OrderRequest>, response: Response<OrderRequest>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(applicationContext,
-                            "Sold yo TSLA fam. u cray. Cash back: ${response.body()?.totalCost} - " +
-                                    "Cash remaining: ${response.body()?.remainingCash}",
-                            LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(applicationContext, "KEEP YO TSLA FAM ${response.message()}", LENGTH_LONG).show()
-                }
-            }
-
-            override fun onFailure(call: Call<OrderRequest>, t: Throwable) {
-                Log.wtf(TAG, "This is why I cry myself to sleep every night")
-            }
-
-        })
-
-    }
-
-    private fun buyStocks(symbol: String, units: Int) {
-        val token = getUserToken(applicationContext)
-
-        val retrofit = Retrofit.Builder()
-                .baseUrl(DEVBASEURL)
-                .addConverterFactory(MoshiConverterFactory.create())
-                .build()
-
-        val portfolioModel = retrofit.create(PortfolioModel::class.java)
-        portfolioModel.buyStocks(token, units, symbol).enqueue(object : Callback<OrderRequest> {
-            override fun onResponse(call: Call<OrderRequest>, response: Response<OrderRequest>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(applicationContext,
-                            "Gotchu some TSLA fam. Cost: ${response.body()?.totalCost} - " +
-                                    "Cash remaining: ${response.body()?.remainingCash}",
-                            LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(applicationContext, "No TSLA for u fam ${response.message()}", LENGTH_LONG).show()
-                }
-
-            }
-
-            override fun onFailure(call: Call<OrderRequest>, t: Throwable) {
-                Log.wtf(TAG, "This is why I cry myself to sleep every night")
-            }
-
-        })
     }
 
     private fun logout() {

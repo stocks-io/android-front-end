@@ -1,4 +1,4 @@
-package com.stocks.stocks_io
+package com.stocks.stocks_io.Adapters
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.stocks.stocks_io.POJO.ExtendedOptions
+import com.stocks.stocks_io.R
 
 class OptionsAdapter(private val dataSet: List<ExtendedOptions>) : RecyclerView.Adapter<OptionsAdapter.ViewHolder>() {
 
     var stockClickLister: StockClickListener? = null
 
-    override fun onBindViewHolder(holder: OptionsAdapter.ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.stockText?.text = dataSet[position].symbol
         holder?.unitsText?.text = dataSet[position].units.toString()
         holder?.moneyText?.text = "$${dataSet[position].price}"
@@ -24,8 +25,8 @@ class OptionsAdapter(private val dataSet: List<ExtendedOptions>) : RecyclerView.
 
     override fun getItemCount(): Int = dataSet.size
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): OptionsAdapter.ViewHolder =
-            OptionsAdapter.ViewHolder(LayoutInflater.from(parent?.context)
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder =
+            ViewHolder(LayoutInflater.from(parent?.context)
                     .inflate(R.layout.options_row, parent, false))
 
 
@@ -43,7 +44,6 @@ class OptionsAdapter(private val dataSet: List<ExtendedOptions>) : RecyclerView.
         }
     }
 }
-
 
 interface StockClickListener {
     fun onStockClicked(option: ExtendedOptions)

@@ -15,4 +15,6 @@
     <string name="how_many">How Many?</string>
     <string name="number">Number</string>
     <string name="go">GO</string>
+
+    <string name="stock_search">Search for stocks</string>
 </resources>

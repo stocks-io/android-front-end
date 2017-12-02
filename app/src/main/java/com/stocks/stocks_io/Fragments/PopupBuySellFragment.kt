@@ -1,4 +1,4 @@
-package com.stocks.stocks_io.Activities
+package com.stocks.stocks_io.Fragments
 
 import android.app.DialogFragment
 import android.content.ContentValues.TAG
@@ -32,15 +32,18 @@ class PopupBuySellFragment : DialogFragment() {
 
     var options: ExtendedOptions? = null
     var dismissListener: (() -> Unit)? = null
+    var bgFragment: DialogFragment? = null
 
     private val MOCK_TOKEN = "E48D1744-6042-4F8B-BC67-3E62B1AC77ED"
     private var isBuying = false
+    public var isShowing = false
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View =
             LayoutInflater.from(activity).inflate(R.layout.fragment_popup_buy_sell, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         ticker_text.text = "${options?.symbol} $${options?.price}"
+        isShowing = true
         options?.let {
             val immutableOptions = options ?: ExtendedOptions("", 1, 1.0)
             setUpGraph(immutableOptions)
@@ -66,6 +69,7 @@ class PopupBuySellFragment : DialogFragment() {
                 }
             })
         }
+
         buy_sell_buttons.setOnCheckedChangeListener { _, checkedId ->
             info_view.visibility = VISIBLE
             isBuying = when (checkedId) { R.id.buy_radio -> true
@@ -104,11 +108,12 @@ class PopupBuySellFragment : DialogFragment() {
                 if (response.isSuccessful) {
                     Toast.makeText(activity, "Successfully ordered!", Toast.LENGTH_LONG).show()
                     dismissListener?.invoke()
+                    bgFragment?.dismiss()
+                    isShowing = false
                     dismiss()
                 } else {
                     Toast.makeText(activity, "No TSLA for u fam ${response.message()}", Toast.LENGTH_LONG).show()
                 }
-
             }
 
             override fun onFailure(call: Call<OrderRequest>, t: Throwable) {

@@ -18,15 +18,17 @@ import com.stocks.stocks_io.Data.Endpoints;
 import com.stocks.stocks_io.Model.UsersModel;
 import com.stocks.stocks_io.POJO.BaseMessage;
 import com.stocks.stocks_io.POJO.LoginResponse;
+import com.stocks.stocks_io.POJO.Results;
 import com.stocks.stocks_io.R;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
+
+import static com.stocks.stocks_io.Utils.NoMoreJavaKt.getAndSaveSymbols;
 
 public class LoginActivity extends AppCompatActivity {
     private String TAG = LoginActivity.class.getSimpleName();
@@ -36,41 +38,41 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
-    @BindView(R.id.auth_title_view)
     public TextView authView;
-
-    @BindView(R.id.email_input)
     public TextInputEditText emailInput;
-
-    @BindView(R.id.password_input)
     public TextInputEditText passwordInput;
-
-    @BindView(R.id.continue_button)
     public FloatingActionButton continueButton;
-
-    @BindView(R.id.auth_switch)
     public Switch authSwitch;
-
-    @BindView(R.id.switch_text)
     public TextView switchText;
-
-    @BindView(R.id.first_name_input)
     public TextInputEditText firstNameInput;
-
-    @BindView(R.id.last_name_input)
     public TextInputEditText lastNameInput;
-
-    @BindView(R.id.register_details)
     public LinearLayout registerDetails;
+
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ButterKnife.bind(this);
+        Realm.init(getApplicationContext());
+        realm = Realm.getDefaultInstance();
+
+        // The noose looks a little more enticing every day
+        authView = findViewById(R.id.auth_title_view);
+        emailInput = findViewById(R.id.email_input);
+        passwordInput = findViewById(R.id.password_input);
+        continueButton = findViewById(R.id.continue_button);
+        authSwitch = findViewById(R.id.auth_switch);
+        switchText = findViewById(R.id.switch_text);
+        firstNameInput = findViewById(R.id.first_name_input);
+        lastNameInput = findViewById(R.id.last_name_input);
+        registerDetails = findViewById(R.id.register_details);
+
         sharedPreferences = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
         editor = sharedPreferences.edit();
+
+        if (realm.where(Results.class).findFirst() == null) getAndSaveSymbols();
 
         if (sharedPreferences.getBoolean(getString(R.string.user_logged_in), false)) {
             Intent intent = new Intent(this, StocksActivity.class);
@@ -80,7 +82,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         switchText.setOnClickListener(v -> authSwitch.setChecked(!authSwitch.isChecked()));
-
         authSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (!isChecked) {
                 registerDetails.setVisibility(View.GONE);
@@ -97,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
             String email, password;
             email = emailInput.getText().toString();
             password = passwordInput.getText().toString();
-            
+
             if (email.equals("")) {
                 Toast.makeText(this, "Please include an email", Toast.LENGTH_LONG).show();
                 return;
@@ -125,6 +126,7 @@ public class LoginActivity extends AppCompatActivity {
                 registerUser(firstName, lastName, email, password);
             }
         });
+
     }
 
     public void registerUser(String firstName, String lastName, String email, String password) {
