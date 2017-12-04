@@ -3,9 +3,11 @@ package com.stocks.stocks_io.Model
 import com.stocks.stocks_io.POJO.BaseMessage
 import com.stocks.stocks_io.POJO.HistoryMessage
 import com.stocks.stocks_io.POJO.LoginResponse
+import com.stocks.stocks_io.POJO.UserScore
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface UsersModel {
@@ -29,4 +31,7 @@ interface UsersModel {
     @POST("users/logout")
     @FormUrlEncoded
     fun logoutUser(@Field("token") token: String): Call<BaseMessage>
+
+    @GET("users/leaderboard")
+    fun getLeaderboard(): Call<List<UserScore>>
 }

@@ -1,6 +1,7 @@
 package com.stocks.stocks_io.Activities
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,6 +9,8 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import com.jjoe64.graphview.series.DataPoint
@@ -51,6 +54,18 @@ class StocksActivity : AppCompatActivity() {
 
         getUserHistory("1234567890")
         getStockWatch()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.leaderboard -> startActivity(Intent(this, LeaderboardActivity::class.java))
+        }
+        return true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.stocks, menu)
+        return true
     }
 
     private fun getStockWatch() {

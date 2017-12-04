@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.StocksActivity"/>
-        <activity android:name=".Activities.BuySellActivity">
+        <activity android:name=".Activities.LeaderboardActivity" android:parentActivityName=".Activities.StocksActivity">
         </activity>
     </application>
 
