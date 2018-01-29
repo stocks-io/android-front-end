@@ -138,6 +138,5 @@
             android:layout_height="wrap_content"
             android:text="@string/register"/>
 
-
     </LinearLayout>
 </ScrollView>
